@@ -184,7 +184,18 @@
       0%, 100% { transform: scale(1); }
       50%      { transform: scale(1.06); }
     }
+    /* Sudah dibaca: berhenti "bernapas" — animasinya untuk memancing dibuka,
+       bukan untuk terus menarik perhatian setelah dibaca. */
+    .envelope-icon.is-tenang { animation: none; }
     .envelope-icon .icon { width: 28px; height: 28px; }
+
+    /* Setelah amplopnya menyusut, kartu waktu diam-diam jadi pintu masuk surat.
+       Sengaja tanpa petunjuk apa pun — tampilannya tetap seperti kartu biasa. */
+    .anniv-card.is-bisa-diketuk {
+      cursor: pointer;
+      transition: transform .2s ease, background .4s ease, box-shadow .4s ease;
+    }
+    .anniv-card.is-bisa-diketuk:active { transform: scale(.98); }
 
     /* ---------- Isi surat ---------- */
     .letter-sheet { background: var(--paper); }
@@ -340,6 +351,10 @@
       </div>
     </div>
 
+    <!-- Hero + Surat dibungkus satu komponen `surat`, supaya kartu waktu bisa
+         mengambil alih tugas membuka surat setelah amplopnya menyusut. -->
+    <div x-data="surat">
+
     <!-- Hero -->
     <section class="clay hero-card center" style="padding: 32px 24px;" x-data="heroAnniversary" :class="{ 'is-anniversary': isAnniversary }">
       <!-- Hujan hati lembut, satu halaman penuh, hanya pas hari jadi -->
@@ -362,7 +377,13 @@
       <span class="hero-name-flourish" x-show="isAnniversary" x-cloak aria-hidden="true"></span>
       <p class="muted mt-sm" style="font-size:15px;">Tempat menyimpan rencana, kenangan, dan kangen kita berdua 🤍</p>
 
-      <div class="anniv-card mt-lg" :class="{ 'is-anniversary': isAnniversary }">
+      <!-- Setelah amplopnya menyusut, kartu ini yang jadi pintu masuk surat -->
+      <div class="anniv-card mt-lg"
+           :class="{ 'is-anniversary': isAnniversary, 'is-bisa-diketuk': kecil }"
+           @click="kecil && openLetter()"
+           :role="kecil ? 'button' : null"
+           :tabindex="kecil ? 0 : null"
+           @keydown.enter="kecil && openLetter()">
         <p class="anniv-badge" x-show="isAnniversary" x-cloak>🤍 <span x-text="anniversaryLabel"></span></p>
         <p class="muted anniv-label" x-text="isAnniversary ? 'Hari ini genap' : 'Bersama sejak'"></p>
         <p class="display anniv-count" x-text="counterText"></p>
@@ -370,19 +391,21 @@
       </div>
     </section>
 
-    <!-- Surat -->
-    <section class="mt-lg" x-data="surat">
+    <!-- Surat: amplopnya hilang begitu tugasnya diambil alih kartu di atas -->
+    <section class="mt-lg" x-show="!kecil" x-cloak>
       <button type="button" class="envelope-card" @click="openLetter">
-        <span class="envelope-icon">
+        <span class="envelope-icon" :class="{ 'is-tenang': sudahDibaca }">
           <svg class="icon" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 7.5 12 13.5l9.5-6"/></svg>
         </span>
         <span>
-          <span style="display:block;font-weight:700;color:var(--ink);">Ada surat untukmu</span>
-          <span class="muted" style="font-size:13px;">Ketuk buat membuka 💌</span>
+          <span style="display:block;font-weight:700;color:var(--ink);" x-text="judulKartu"></span>
+          <span class="muted" style="font-size:13px;" x-text="subJudulKartu"></span>
         </span>
       </button>
 
-      <!-- Isi surat -->
+    </section>
+
+    <!-- Isi surat -->
       <div class="modal-backdrop" x-show="open" x-cloak @click.self="closeLetter"
            x-transition:enter="modal-anim-enter" x-transition:enter-start="modal-anim-enter-start" x-transition:enter-end="modal-anim-enter-end"
            x-transition:leave="modal-anim-leave" x-transition:leave-start="modal-anim-leave-start" x-transition:leave-end="modal-anim-leave-end">
@@ -406,7 +429,7 @@
           <button type="button" class="clay-btn" @click="closeLetter">Tutup surat</button>
         </div>
       </div>
-    </section>
+    </div><!-- /x-data="surat" -->
 
     <!-- Papan Kangen -->
     <section class="mt-lg" x-data="papan">
@@ -520,7 +543,7 @@
 
       <div class="grid-2">
         <a href="./cerita.html" class="clay-card" style="text-decoration:none;">
-          <svg class="icon" viewBox="0 0 24 24" style="color:var(--rose);"><path d="M12 21s-7-4.35-9.5-8.5C.7 9.2 2 5.5 5.5 5c2-.3 3.6.7 4.5 2 .9-1.3 2.5-2.3 4.5-2 3.5.5 4.8 4.2 3 7.5C19 16.65 12 21 12 21z"/></svg>
+          <svg class="icon" viewBox="0 0 24 24" style="color:var(--rose);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           <p style="font-weight:700;color:var(--ink);margin:12px 0 2px;">Cerita Kita</p>
           <p class="muted" style="font-size:13px;margin:0;">Perjalanan &amp; momen</p>
         </a>
@@ -538,7 +561,7 @@
         </a>
 
         <a href="./nikah.html" class="clay-card" style="text-decoration:none;">
-          <svg class="icon" viewBox="0 0 24 24" style="color:var(--wine);"><circle cx="8" cy="15" r="5"/><circle cx="16" cy="15" r="5"/><path d="M9 8l1-4h4l1 4"/></svg>
+          <svg class="icon" viewBox="0 0 24 24" style="color:var(--wine);"><circle cx="9" cy="15" r="5.5"/><circle cx="15.5" cy="10.5" r="5.5"/></svg>
           <p style="font-weight:700;color:var(--ink);margin:12px 0 2px;">Rencana Nikah</p>
           <p class="muted" style="font-size:13px;margin:0;">Persiapan hari bahagia</p>
         </a>
@@ -563,11 +586,11 @@
         <span>Cerita</span>
       </a>
       <a class="bottom-nav__item" href="./wishlist.html" :class="{ 'is-active': isActive('wishlist.html') }" :aria-current="isActive('wishlist.html') ? 'page' : null">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.7 9.2 2 5.5 5.5 5c2-.3 3.6.7 4.5 2 .9-1.3 2.5-2.3 4.5-2 3.5.5 4.8 4.2 3 7.5C19 16.65 12 21 12 21z"/></svg>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span>Wishlist</span>
       </a>
       <a class="bottom-nav__item" href="./nikah.html" :class="{ 'is-active': isActive('nikah.html') }" :aria-current="isActive('nikah.html') ? 'page' : null">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="5"/><circle cx="16" cy="15" r="5"/><path d="M9 8l1-4h4l1 4"/></svg>
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="15" r="5.5"/><circle cx="15.5" cy="10.5" r="5.5"/></svg>
         <span>Nikah</span>
       </a>
     </div>

@@ -9,22 +9,30 @@
    SURAT UNTUK PASANGANMU — ganti isinya dengan kata-katamu sendiri.
    Tiap item array = satu paragraf. Boleh ditambah/dikurangi sesukanya.
    --------------------------------------------------------------------------- */
-const SURAT_JUDUL = 'Untuk Novi';
+const SURAT_JUDUL = 'Untuk Sayangku, Novi';
 const SURAT_PARAGRAF = [
-  'Hai sayang, selamat hari jadi kita yang pertama.',
-  'Setahun ini rasanya cepat sekali, tapi kalau diingat-ingat lagi, banyak banget yang sudah kita lewati bareng. Ada hari-hari yang biasa saja, ada yang bikin ketawa sampai sakit perut, ada juga yang berat — dan semuanya jadi lebih ringan karena ada kamu.',
-  'App kecil ini aku buat sendiri buat kita berdua. Isinya tempat-tempat yang pengen kita datangi, film yang pengen kita tonton, foto-foto kita, dan papan buat saling nitip pesan kalau lagi kangen. Anggap saja rumah kecil buat mimpi-mimpi kita.',
-  'Terima kasih sudah mau jalan bareng aku sejauh ini. Semoga masih banyak tahun-tahun berikutnya yang bisa kita isi di sini.',
+  'Hai sayang,',
+  'Selamat untuk satu tahunnya kita. Ga terasa sudah setahun bersama, sudah melewati segalanya berdua. Banyak yang sudah kita lewati, ada hari biasa, ada hari yang seru, ada juga hari yang berat. Dan semuanya jadi lebih ringan karena ada sayangku.',
+  'Sebagai bentuk cintaku ke kamu, app kecil ini untuk kita berdua. Bisa diisi dengan tempat yang kita ingin kunjungi, makanan yang pingin kita icipi, atau wishlist-wishlist yang lain. Juga bisa tambah cerita kenangan dan catatan kecil buat titip pesan. Wadah kecil untuk impian-impian kita berdua.',
+  'Terima kasih sayangku sudah jalan bareng aku sejauh ini. Semoga banyak tahun-tahun berikutnya yang bisa kita isi berdua, dan cinta kita semakin besar.',
 ];
-const SURAT_PENUTUP = 'Dengan sayang,';
+const SURAT_PENUTUP = 'Yang sayang kamu,';
 const SURAT_TTD = 'Dido';
 
 /* Ucapan yang muncul di kartu waktu tepat pada hari jadi — ganti sesukamu. */
-const ANNIV_UCAPAN = 'Selamat hari jadi, sayang. Terima kasih untuk setahun ini 🤍';
+const ANNIV_UCAPAN = 'Terima kasih untuk setahun ini sayangku, aku mencintaimu 🤍';
 
 const PAPAN_NOTE_LIMIT = 8;
 const PAPAN_SEEN_KEY = 'impian-kita:papan-seen';
+const SURAT_SEEN_KEY = 'impian-kita:surat-dibaca';
 const RENCANA_LIMIT = 3;
+
+/** Tanggal hari jadi pertama (ANNIVERSARY + 1 tahun) — dipakai menyusutkan kartu surat. */
+function tanggalHariJadiPertama() {
+  const d = new Date(ANNIVERSARY + 'T00:00:00');
+  d.setFullYear(d.getFullYear() + 1);
+  return toDateStr(d);
+}
 
 /** Bikin daftar hati untuk animasi hujan hati pas hari jadi. */
 function buildHearts(jumlah = 14) {
@@ -80,13 +88,56 @@ document.addEventListener('alpine:init', () => {
   /* --- Surat: amplop yang diketuk lalu menampilkan pesan --- */
   Alpine.data('surat', () => ({
     open: false,
+    sudahDibaca: false,
     judul: SURAT_JUDUL,
     paragraf: SURAT_PARAGRAF,
     penutup: SURAT_PENUTUP,
     ttd: SURAT_TTD,
 
+    paksaKecil: false,
+
+    init() {
+      try {
+        this.sudahDibaca = localStorage.getItem(SURAT_SEEN_KEY) === '1';
+      } catch (err) {
+        this.sudahDibaca = false;
+      }
+
+      // Mode pratinjau: buka index.html?surat=kecil untuk melihat tampilan
+      // setelah amplopnya menyusut, tanpa menunggu 1 September lewat.
+      this.paksaKecil = new URLSearchParams(location.search).get('surat') === 'kecil';
+    },
+
+    /* Tulisan di kartu berubah setelah suratnya pernah dibuka — biar tidak
+       terus-terusan terkesan "ada yang baru" padahal sudah dibaca. */
+    get judulKartu() {
+      return this.sudahDibaca ? `Surat dari ${this.ttd}` : 'Ada surat untukmu';
+    },
+
+    get subJudulKartu() {
+      return this.sudahDibaca ? 'Baca lagi kapan saja' : 'Ketuk buat membuka 💌';
+    },
+
+    /**
+     * Kartu menyusut jadi tautan kecil hanya kalau suratnya SUDAH dibaca DAN
+     * hari jadi pertama sudah lewat. Dua-duanya wajib: kalau cuma mengandalkan
+     * tanggal, surat yang belum sempat dibuka bisa keburu mengecil dan terlewat.
+     */
+    get kecil() {
+      if (this.paksaKecil) return true;
+      return this.sudahDibaca && daysUntil(tanggalHariJadiPertama()) < 0;
+    },
+
     openLetter() {
       this.open = true;
+      if (!this.sudahDibaca) {
+        this.sudahDibaca = true;
+        try {
+          localStorage.setItem(SURAT_SEEN_KEY, '1');
+        } catch (err) {
+          console.warn('Tidak bisa menyimpan penanda surat dibaca:', err);
+        }
+      }
     },
 
     closeLetter() {
