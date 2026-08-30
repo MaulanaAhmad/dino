@@ -196,6 +196,14 @@ Situs ini **statis murni** — tidak ada build step. Setelan project di Vercel:
 
 Alur update setelah live: ubah kode → **naikkan `CACHE_VERSION` di [sw.js](sw.js)** → commit → push. Vercel deploy otomatis.
 
+### Subdomain lewat Cloudflare
+
+DNS domain ada di Cloudflare. Tambahkan record: **CNAME** · nama `impian` · target `cname.vercel-dns.com`.
+
+> **Proxy harus DNS only (awan abu-abu), bukan Proxied (awan oranye).**
+> Kalau proxy menyala sementara mode SSL/TLS Cloudflare masih "Flexible", Cloudflare mengirim permintaan ke Vercel lewat HTTP, sedangkan Vercel selalu mengalihkan ke HTTPS — hasilnya *redirect loop* ("Too many redirects") dan situs tidak bisa dibuka. Dengan DNS only, Vercel yang menangani sertifikatnya sendiri dan semuanya beres.
+> Kalau memang mau proxy tetap menyala, mode SSL/TLS Cloudflare wajib diubah ke **Full (strict)** lebih dulu.
+
 ## Catatan deploy
 
 - Semua path pakai `./` (relatif) — aman untuk root domain maupun subfolder `/repo/` di GitHub Pages.
