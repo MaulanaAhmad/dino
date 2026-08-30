@@ -181,6 +181,21 @@ Service worker (`sw.js`) meng-cache app shell untuk offline. Setiap kali menamba
 3. Tambahkan halaman baru ke `APP_SHELL` di `sw.js`, naikkan `CACHE_VERSION`.
 4. Kalau jadi menu ke-6 di bottom nav: update `BOTTOM_NAV_ITEMS` di `app.js` **dan** tambahkan `<a>` item barunya secara manual di markup nav semua halaman (nav tidak di-generate dari array, karena tanpa build tool markup-nya memang diduplikasi per halaman — hanya logic active-state yang shared).
 
+## Deploy (Vercel)
+
+Situs ini **statis murni** — tidak ada build step. Setelan project di Vercel:
+
+| Setelan | Nilai |
+|---|---|
+| Framework Preset | Other |
+| Build Command | *(kosongkan)* |
+| Output Directory | *(kosongkan — pakai root repo)* |
+| Install Command | *(kosongkan)* |
+
+[vercel.json](vercel.json) memaksa semua berkas **selalu divalidasi ulang** (`max-age=0, must-revalidate`). Ini disengaja: nama berkasnya tidak ber-hash (`app.js`, `app.css` tetap sama tiap versi), jadi kalau dicache lama, perubahan tidak akan pernah sampai ke HP kalian. Kecepatan & mode offline tetap ditangani service worker, bukan HTTP cache.
+
+Alur update setelah live: ubah kode → **naikkan `CACHE_VERSION` di [sw.js](sw.js)** → commit → push. Vercel deploy otomatis.
+
 ## Catatan deploy
 
 - Semua path pakai `./` (relatif) — aman untuk root domain maupun subfolder `/repo/` di GitHub Pages.
