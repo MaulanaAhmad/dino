@@ -1,0 +1,633 @@
+/* ==========================================================================
+   Tempat Impian Kita — Design System (Claymorphism hangat & romantis)
+   Dipakai di semua halaman. Jangan duplikasi style ini per-halaman.
+   ========================================================================== */
+
+:root {
+  --cream: #FBF4EC;
+  --paper: #FFFBF6;
+  --blush: #F3DED4;
+  --rose: #B4566B;
+  --rose-soft: #D98A9C;
+  --wine: #7A2E42;
+  --ink: #4A2F33;
+  --ink-soft: #8A6B6F;
+  --gold: #C7A24B;
+  --line: #EAD7CC;
+
+  /* clay shadows: terang di kiri-atas, gelap di kanan-bawah, senada latar */
+  --clay-shadow-out: 8px 8px 20px rgba(122, 46, 66, .12), -8px -8px 20px rgba(255, 255, 255, .85);
+  --clay-shadow-out-sm: 5px 5px 12px rgba(122, 46, 66, .10), -5px -5px 12px rgba(255, 255, 255, .8);
+  --clay-shadow-in: inset 4px 4px 10px rgba(122, 46, 66, .16), inset -4px -4px 10px rgba(255, 255, 255, .7);
+
+  --radius-lg: 32px;
+  --radius-md: 24px;
+  --radius-sm: 16px;
+
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Mulish', sans-serif;
+
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--cream);
+  background-image: radial-gradient(circle at 15% 0%, rgba(217, 138, 156, .12), transparent 45%),
+                     radial-gradient(circle at 100% 30%, rgba(199, 162, 75, .10), transparent 40%);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: calc(96px + var(--safe-bottom));
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  color: var(--wine);
+  margin: 0;
+}
+
+em, .accent-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--rose);
+}
+
+a {
+  color: var(--rose);
+  text-decoration: none;
+}
+
+.container {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 20px 20px;
+}
+
+/* ---------- Clay building blocks ---------- */
+
+.clay {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-shadow-out);
+  border: 1px solid rgba(255, 255, 255, .6);
+}
+
+.clay-card {
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-out);
+  padding: 20px;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.clay-card:active {
+  transform: scale(.97);
+  box-shadow: var(--clay-shadow-in);
+}
+
+.clay-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--paper);
+  background: linear-gradient(145deg, var(--rose), var(--wine));
+  border: none;
+  border-radius: 999px;
+  padding: 14px 28px;
+  box-shadow: var(--clay-shadow-out-sm);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.clay-btn:active {
+  transform: scale(.97);
+  box-shadow: var(--clay-shadow-in);
+}
+
+.clay-btn.secondary {
+  color: var(--wine);
+  background: var(--blush);
+}
+
+.clay-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--clay-shadow-out-sm);
+  border: none;
+  color: var(--wine);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.clay-icon-btn:active {
+  transform: scale(.94);
+  box-shadow: var(--clay-shadow-in);
+}
+
+.clay-input,
+.clay-select,
+.clay-textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  box-shadow: var(--clay-shadow-in);
+  outline: none;
+}
+
+.clay-input::placeholder,
+.clay-textarea::placeholder {
+  color: var(--ink-soft);
+}
+
+.clay-input:focus,
+.clay-select:focus,
+.clay-textarea:focus {
+  box-shadow: var(--clay-shadow-in), 0 0 0 2px var(--rose-soft);
+}
+
+/* Chevron custom buat <select>, biar tidak kelihatan default browser. */
+.clay-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A2E42' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 42px;
+  cursor: pointer;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wine);
+  background: var(--blush);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Top bar (shared) ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.topbar h1 {
+  font-size: 22px;
+}
+
+/* ---------- Bottom navigation ---------- */
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px calc(14px + var(--safe-bottom));
+  z-index: 100;
+  pointer-events: none;
+}
+
+.bottom-nav__bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 2px;
+  width: 100%;
+  max-width: 440px;
+  background: var(--paper);
+  border-radius: 26px;
+  padding: 6px;
+  box-shadow: var(--clay-shadow-out);
+  border: 1px solid rgba(255, 255, 255, .6);
+}
+
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 7px 2px 6px;
+  min-width: 0;
+  border-radius: 18px;
+  color: var(--ink-soft);
+  transition: transform .2s ease, box-shadow .2s ease, color .2s ease, background .2s ease;
+}
+
+.bottom-nav__item .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.bottom-nav__item span {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bottom-nav__item:active {
+  transform: scale(.93);
+}
+
+.bottom-nav__item.is-active {
+  color: var(--wine);
+  background: var(--blush);
+  box-shadow: var(--clay-shadow-in);
+}
+
+/* ---------- Utility ---------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.center {
+  text-align: center;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.mt-0 { margin-top: 0; }
+.mt-sm { margin-top: 8px; }
+.mt-md { margin-top: 16px; }
+.mt-lg { margin-top: 28px; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.placeholder-page {
+  min-height: calc(100vh - 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  padding: 40px 24px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--ink-soft);
+}
+
+/* ---------- Status sync (wishlist, cerita) ---------- */
+
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--blush);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+
+.sync-dot.is-syncing { animation: sync-pulse 1s ease-in-out infinite; }
+.sync-dot.is-offline { opacity: .4; }
+
+@keyframes sync-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+
+/* ---------- Modal bottom-sheet (wishlist, cerita, papan kangen) ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 47, 51, .35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 560px;
+  background: var(--cream);
+  border-radius: 32px 32px 0 0;
+  padding: 24px 20px calc(28px + var(--safe-bottom));
+  box-shadow: var(--clay-shadow-out);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+/* Kelas transisi Alpine (project ini tanpa Tailwind, jadi didefinisikan manual). */
+.modal-anim-enter { transition: opacity .25s ease-out; }
+.modal-anim-enter-start { opacity: 0; }
+.modal-anim-enter-end { opacity: 1; }
+.modal-anim-leave { transition: opacity .15s ease-in; }
+.modal-anim-leave-start { opacity: 1; }
+.modal-anim-leave-end { opacity: 0; }
+
+.sheet-anim-enter { transition: transform .25s ease-out; }
+.sheet-anim-enter-start { transform: translateY(100%); }
+.sheet-anim-enter-end { transform: translateY(0); }
+.sheet-anim-leave { transition: transform .15s ease-in; }
+.sheet-anim-leave-start { transform: translateY(0); }
+.sheet-anim-leave-end { transform: translateY(100%); }
+
+/* ---------- Kartu daftar (Wishlist & Kalender) ----------
+   Dipakai bersama supaya tombol aksinya tidak jatuh ke tampilan bawaan
+   browser di halaman yang lupa mendefinisikannya. */
+
+.place-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.place-card__icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blush);
+  color: var(--wine);
+  box-shadow: var(--clay-shadow-in);
+}
+
+.place-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex: none;
+}
+
+.place-card__actions button {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px;
+  transition: transform .2s ease, color .2s ease;
+}
+
+.place-card__actions button:active {
+  transform: scale(.88);
+  color: var(--wine);
+}
+
+.place-card.is-done,
+.place-card.is-redup { opacity: .55; }
+
+.place-card.is-done .place-card__title { text-decoration: line-through; }
+
+/* ---------- Kartu "kamu siapa?" (Papan Kangen & Cerita) ---------- */
+
+.identity-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--clay-shadow-out-sm);
+}
+
+.identity-ganti {
+  display: block;
+  margin: 2px auto 0;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.identity-ganti strong { color: var(--wine); }
+
+/* ---------- Lightbox foto (Cerita) ---------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(74, 47, 51, .82);
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .35);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--wine);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--clay-shadow-out-sm);
+}
+
+.lightbox__caption {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: calc(20px + var(--safe-bottom));
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--paper);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .5);
+}
+
+/* ---------- Grid kalender (kalender.html + date-picker wishlist/cerita) ---------- */
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.calendar-cell:active { transform: scale(.93); }
+.calendar-cell.is-other-month { color: var(--ink-soft); opacity: .4; }
+.calendar-cell.is-today { background: var(--cream); box-shadow: var(--clay-shadow-in); }
+.calendar-cell.is-selected { background: var(--blush); color: var(--wine); box-shadow: var(--clay-shadow-in); }
+
+.calendar-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--rose); }
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* ---------- Date-picker custom (pengganti <input type="date">) ---------- */
+
+.date-picker-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  box-shadow: var(--clay-shadow-in);
+  cursor: pointer;
+}
+
+.date-picker-trigger.is-placeholder {
+  color: var(--ink-soft);
+}
+
+.date-picker-panel {
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-out-sm);
+}
+
+.date-picker-panel .month-nav {
+  margin-bottom: 10px;
+}
+
+.date-picker-panel .month-nav .clay-icon-btn {
+  width: 38px;
+  height: 38px;
+}
+
+.date-picker-clear {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}

@@ -1,0 +1,12 @@
+# Konfigurasi tooling lokal (bukan bagian aplikasi)
+.claude/
+
+# Berkas sistem
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
