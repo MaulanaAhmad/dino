@@ -19,6 +19,12 @@ Web app PWA privat untuk Dido & Novi. Static site (HTML + Alpine.js + Supabase),
 13. **Wishlist disempurnakan** — konfirmasi hapus memakai modal clay (ini yang terakhir; sekarang benar-benar tidak ada lagi `alert()`/`confirm()` bawaan browser di seluruh app); default "yang pengen ke sana" mengikuti identitas; ringkasan "7 tempat · 1 sudah dikunjungi" di header; item yang punya rencana tanggal bisa diketuk langsung ke Kalender di tanggal tersebut (`kalender.html?tanggal=YYYY-MM-DD`) lengkap dengan badge hitung mundur; tab Tempat/Film terakhir diingat; dan urutan daftar jadi lebih berguna — yang punya tanggal terdekat di atas, yang sudah dijalani turun ke bawah.
 14. **Agenda kencan** — rencana bertanggal yang **bukan** wishlist ("Sabtu nonton jam 7"), diinput langsung dari Kalender dengan mengetuk tanggalnya. Punya jam, tempat ketemu, catatan, dan penanda sudah dijalani. Muncul di Kalender dengan titik wine, dan ikut terhitung di "Rencana Terdekat" pada Beranda.
 15. **Papan Kangen disempurnakan** — app mengingat "kamu siapa" (Dido/Novi) di HP masing-masing, jadi pengirim terisi otomatis; tiap pesan menampilkan **waktu relatif** ("baru saja", "2 jam lalu", "kemarin"); **pesan baru dari pasangan** ditandai badge jumlah di judul + cincin rose + titik merah di note-nya; konfirmasi hapus memakai modal clay (bukan `confirm()` bawaan browser).
+16. **Rencana Nikah tahap 1: "Perjalanan Menuju Nikah"** — halaman Nikah tidak lagi placeholder:
+    - **Hitung mundur** ke langkah bertanggal terdekat yang belum selesai ("17 hari lagi menuju Lamaran · Sabtu, 24 Oktober 2026"), "Hari ini!" tepat di harinya, dan pesan netral kalau belum ada yang dijadwalkan.
+    - **Timeline vertikal** langkah-langkah (urut `sort_order`) dengan titik + garis penghubung, badge status (selesai gold, dijadwalkan rose, belum abu lembut), dan tanggal atau "tanggal menyusul".
+    - Ketuk langkah untuk membuka **checklist** (centang, tambah, hapus) dan **Catatan hasil** yang tersimpan sendiri saat keluar dari kolom (indikator "Tersimpan").
+    - Tambah/edit langkah lewat bottom sheet (judul, tanggal opsional, status); hapus langkah dengan konfirmasi, checklist-nya ikut terhapus lewat cascade.
+    - Semua perubahan **optimistic** (langsung tampil) dan dikembalikan kalau gagal tersimpan; realtime antar HP.
 
 ## Struktur halaman & fitur
 
@@ -28,7 +34,7 @@ Web app PWA privat untuk Dido & Novi. Static site (HTML + Alpine.js + Supabase),
 | [kalender.html](kalender.html) | Linimasa dua arah: rencana (`places.visit_date`) + kenangan (`moments.moment_date`) + hari jadi tahunan. Titik berwarna per jenis, ringkasan bulan, tombol "kembali ke bulan ini", dan tanggal kosong menawarkan tambah rencana |
 | [cerita.html](cerita.html) | Timeline foto dikelompokkan per bulan: foto tampil utuh (tidak dipotong) & bisa diketuk untuk lihat penuh, caption, tanggal, edit, hapus, dan reaction yang menunjukkan siapa yang suka |
 | [wishlist.html](wishlist.html) | Tab **Tempat**: CRUD wisata/kuliner (nama, kategori, siapa, lokasi, rencana tanggal, catatan). Tab **Film**: watchlist movie/series (judul, genre, siapa, platform, rencana nonton) |
-| [nikah.html](nikah.html) | Sengaja dibiarkan ringkas — cincin, judul, dan satu kalimat pengantar. Belum berfungsi, statis, tanpa database |
+| [nikah.html](nikah.html) | Tahap 1 "Perjalanan Menuju Nikah": hitung mundur ke langkah terdekat, timeline langkah dengan status, checklist & catatan hasil per langkah |
 
 ## Struktur file
 
@@ -37,7 +43,7 @@ index.html              Beranda (+ Papan Kangen)
 kalender.html            Kalender rencana wishlist
 cerita.html              Timeline foto Cerita Kita
 wishlist.html            Wishlist tempat impian
-nikah.html               Rencana Nikah (placeholder)
+nikah.html               Rencana Nikah (Perjalanan Menuju Nikah)
 manifest.json            Manifest PWA
 sw.js                    Service worker (cache app shell, offline)
 
@@ -50,6 +56,7 @@ assets/js/beranda.js     Komponen Beranda: 'heroAnniversary', 'surat', 'papan',
 assets/js/wishlist.js    Alpine component 'wishlist' (CRUD + realtime + date-picker)
 assets/js/kalender.js    Alpine component 'calendar'
 assets/js/cerita.js      Alpine component 'cerita' (upload foto + kompres + realtime + date-picker)
+assets/js/nikah.js       Alpine component 'nikah' (timeline langkah + checklist + catatan + realtime)
 
 assets/img/              Foto & icon
 ```
@@ -121,6 +128,37 @@ Beda dengan `places`: wishlist itu **keinginan tanpa waktu pasti**, agenda itu *
 | who | text | `Dido & Novi` / `Dido` / `Novi` |
 | created_at | timestamptz | default `now()` — dipakai urutkan & batasi 8 pesan terbaru |
 
+### Tabel `wedding_milestones` & `wedding_checklist` (Rencana Nikah)
+
+Dibuat manual di Supabase (tidak ada migration di repo ini).
+
+`wedding_milestones` — langkah-langkah menuju nikah:
+
+| kolom | tipe | keterangan |
+|---|---|---|
+| id | — | primary key |
+| list_code | text | filter |
+| title | text | judul langkah |
+| event_date | date | tanggal (opsional) — dipakai hitung mundur |
+| status | text | `belum` / `dijadwalkan` / `selesai` |
+| notes | text | "Catatan hasil" |
+| sort_order | int | urutan di timeline; langkah baru = urutan terakhir + 1 |
+| created_at | timestamptz | default `now()` |
+
+`wedding_checklist` — checklist per langkah:
+
+| kolom | tipe | keterangan |
+|---|---|---|
+| id | — | primary key |
+| list_code | text | filter |
+| milestone_id | FK → `wedding_milestones.id` | `on delete cascade` — hapus langkah = checklist-nya ikut terhapus |
+| text | text | isi item |
+| done | bool | sudah dicentang |
+| sort_order | int | urutan dalam satu langkah |
+| created_at | timestamptz | default `now()` |
+
+Kedua tabel sudah masuk publikasi realtime. Baris baru dikirim **tanpa** `id` — id-nya diambil dari balasan server (`insert().select().single()`), jadi kode tidak bergantung pada tipe kolom `id`.
+
 Semua tabel: RLS aktif dengan policy `for all to anon using (true) with check (true)` (akses penuh pakai anon/publishable key — wajar untuk app privat tanpa sistem login, key-nya tidak pernah dipublikasikan di luar app).
 
 ## Konfigurasi
@@ -155,7 +193,7 @@ const LIST_CODE = 'kita-9f4b27e1a6c3';  // JANGAN diubah kecuali mau mulai data 
   ```
 - **Supabase client** cukup satu instance (`getSupabaseClient()` di `app.js`, memoized) — jangan panggil `createClient()` sendiri di file lain, supaya tidak muncul warning "Multiple GoTrueClient instances".
 - **Realtime**: tiap komponen yang butuh sinkron live subscribe ke `postgres_changes` lalu reload data (pola sederhana: reload penuh, bukan patch manual — cukup untuk skala data kecil app ini).
-- **Status sync** ('syncing' | 'synced' | 'offline') dipakai di wishlist & cerita, styling-nya `.sync-pill`/`.sync-dot` di `app.css`.
+- **Status sync** ('syncing' | 'synced' | 'offline') dipakai di wishlist, cerita & nikah, styling-nya `.sync-pill`/`.sync-dot` di `app.css`.
 - **Modal bottom-sheet**, **grid kalender**, dan **date-picker** semua CSS-nya di `app.css` (shared) — jangan duplikasi ulang di `<style>` per halaman. Kalender & date-picker sama-sama pakai `buildCalendarGrid(year, month, isMarkedFn)` dari `app.js`.
 - **Transisi Alpine** (`x-transition:enter="..."`) pakai nama kelas custom (`modal-anim-*`, `sheet-anim-*`) yang didefinisikan manual di `app.css` — project ini **tanpa Tailwind**, jadi nama kelas seperti `opacity-0` TIDAK akan bekerja kecuali didefinisikan sendiri.
 - **Identitas pemakai** disimpan di `localStorage` (`impian-kita:me` → `'Dido'` / `'Novi'`) lewat `getMe()`/`setMe()`/`getPasangan()` di `app.js`. Ini **bukan autentikasi** — cuma penanda lokal per-HP supaya Papan Kangen tahu siapa pengirimnya dan mana pesan dari pasangan. Jangan dipakai untuk hal yang butuh keamanan.
@@ -176,7 +214,7 @@ Service worker (`sw.js`) meng-cache app shell untuk offline. Setiap kali menamba
 
 ## Menambah halaman baru
 
-1. Salin `nikah.html` sebagai starting point (sudah ada meta PWA + bottom nav 5 item + script tags).
+1. Salin salah satu halaman (misalnya `nikah.html`) sebagai starting point — ambil `<head>` (meta PWA), bottom nav 5 item, dan script tags-nya, lalu ganti isi `<main>`.
 2. Kalau butuh Supabase, tambah script `supabase.min.js` + buat `assets/js/<nama>.js` sendiri (ikuti pola `alpine:init` di atas).
 3. Tambahkan halaman baru ke `APP_SHELL` di `sw.js`, naikkan `CACHE_VERSION`.
 4. Kalau jadi menu ke-6 di bottom nav: update `BOTTOM_NAV_ITEMS` di `app.js` **dan** tambahkan `<a>` item barunya secara manual di markup nav semua halaman (nav tidak di-generate dari array, karena tanpa build tool markup-nya memang diduplikasi per halaman — hanya logic active-state yang shared).

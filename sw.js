@@ -5,7 +5,7 @@
    supaya aman di subfolder GitHub Pages (/repo/).
    ========================================================================== */
 
-const CACHE_VERSION = 'v33';
+const CACHE_VERSION = 'v34';
 const CACHE_NAME = `impian-kita-shell-${CACHE_VERSION}`;
 
 // Path relatif terhadap sw.js (di root situs/subfolder).
@@ -23,6 +23,7 @@ const APP_SHELL = [
   './assets/js/kalender.js',
   './assets/js/cerita.js',
   './assets/js/beranda.js',
+  './assets/js/nikah.js',
   './assets/img/icon-192.png',
   './assets/img/icon-512.png',
   './assets/img/icon-192-maskable.png',
